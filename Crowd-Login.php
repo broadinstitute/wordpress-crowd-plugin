@@ -60,7 +60,6 @@ function crowd_authenticate($user, $username, $password) {
 	} catch (CrowdConnectionException $e) {
 		$error = new WP_Error();
 		$error->add('crowd_conn_error', $e->getMessage());
-
 		return $error;
 	}
 
@@ -88,7 +87,6 @@ function crowd_authenticate($user, $username, $password) {
 		if ( empty($password) ) {
 			$error->add('empty_password', __('<strong>ERROR</strong>: The password field is empty.'));
 		}
-
 		return $error;
 	}
 
@@ -156,18 +154,18 @@ function crowd_authenticate($user, $username, $password) {
 function crowd_can_authenticate($username, $password) {
 	global $crowd, $princ_token;
 
-	$result = false;
-
 	// If we can't get a Crowd instance, fail
 	if ($crowd == NULL) {
-		return $result;
+	  return new WP_Error('crowd_error', __('<strong>Crowd Login Error</strong>: No Crowd Instance'));
 	}
 
 	$princ_token = $crowd->authenticatePrincipal($username, $password, $_SERVER['HTTP_USER_AGENT'], $_SERVER['REMOTE_ADDR']);
 
-	$result = ($princ_token == NULL) ? false : true;
+	if ($princ_token == NULL) {
+	  return new WP_Error('no_crowd_princ_error', __('<strong>Crowd Login Error</strong>: Could not retrieve principal.'));
+	}
 
-	return $result;
+	return $princ_token;
 }
 
 function crowd_is_in_group($username) {
