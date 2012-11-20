@@ -36,7 +36,9 @@ class Crowd {
         try {
             $this->crowd_client = new SoapClient($this->crowd_config['service_url']);
         } catch (SoapFault $fault) {
-            echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+	    $faultcode = $fault->getCode();
+	    $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}"; 
             throw new CrowdConnectionException("Unable to connect to Crowd.  Verify the service_url property is defined and Crowd is running.");
         }
     }
@@ -50,7 +52,9 @@ class Crowd {
         try {
             $resp = $this->crowd_client->authenticateApplication($param);
         } catch (SoapFault $fault) {
-           echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+            $faultcode = $fault->getCode();
+            $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}";
         }
 
         $this->crowd_app_token = $resp->out->token;
@@ -83,7 +87,9 @@ class Crowd {
         try {
             $resp = $this->crowd_client->authenticatePrincipal($param);
         } catch (SoapFault $fault) {
-            echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+            $faultcode = $fault->getCode();
+            $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}";
             return null;
         }
 
@@ -110,7 +116,9 @@ class Crowd {
         try {
             $resp = $this->crowd_client->isValidPrincipalToken($param);
         } catch (SoapFault $fault) {
-            echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+            $faultcode = $fault->getCode();
+            $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}";
             return '';
         }
 
@@ -133,7 +141,9 @@ class Crowd {
             $resp = $this->crowd_client->invalidatePrincipalToken($param);
             return true;
         } catch (SoapFault $fault) {
-            echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+            $faultcode = $fault->getCode();
+            $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}";
         }
         return false;
     }
@@ -151,7 +161,9 @@ class Crowd {
             $resp = $this->crowd_client->findPrincipalByToken($param);
             return $resp->out;
         } catch (SoapFault $fault) {
-            echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+            $faultcode = $fault->getCode();
+            $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}";
             return null;
         }
     }
@@ -169,7 +181,9 @@ class Crowd {
             $resp = $this->crowd_client->findGroupMemberships($param);
             return $resp->out;
         } catch (SoapFault $fault) {
-            echo "SOAP Fault: faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}"; 
+            $faultcode = $fault->getCode();
+            $faultstring = $fault->getMessage();
+            echo "SOAP Fault: faultcode: {$faultcode}, faultstring: {$faultstring}";
             return null;
         }
     }
