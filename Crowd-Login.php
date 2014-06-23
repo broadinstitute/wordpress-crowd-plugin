@@ -8,8 +8,8 @@ Author: Andrew Teixeira
 Author URI: 
 */
 
-require_once( WP_PLUGIN_DIR."/crowd-login/Crowd.php");
-require_once( ABSPATH . WPINC . '/registration.php');
+require_once(__DIR__ . "/Crowd.php");
+require_once(ABSPATH . WPINC . '/registration.php');
 
 //Admin
 function crowd_menu() {
