@@ -109,6 +109,10 @@ $crowd_group = get_option('crowd_group');
 $crowd_account_type = get_option('crowd_account_type');
 
 ?>
+<script>
+  var crowdAccountType = "<?php echo $crowd_account_type; ?>";
+  var crowdGroup = "<?php echo $crowd_group; ?>";
+</script>
 <div class="container">
   <div class="banner"><h1>Crowd Login 0.1</h1></div>
   <form style="display::inline;" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>&updated=true">
@@ -140,19 +144,25 @@ $crowd_account_type = get_option('crowd_account_type');
     <div class="advanced">
       <h2>Advanced</h2>
       <h3>For the intrepid and daring among you.</h3>
-      <p style="margin-bottom:0px;"><strong>Login mode:</strong><br>
-        <input name="crowd_login_mode" type="radio" value="mode_normal" <?php if($crowd_login_mode=="mode_normal"){echo "checked";}?> > <label for="mode_normal">Authenticate Wordpress users against Crowd. I will create the accounts in Wordpress myself. (default)</label><br/>
-        <input name="crowd_login_mode" type="radio" value="mode_create_all" <?php if($crowd_login_mode=="mode_create_all"){echo "checked";}?> > <label for="mode_create_all">Create Wordpress accounts for anyone who successfully authenticates against Crowd.</label><br/>
-        <input name="crowd_login_mode" type="radio" value="mode_create_group" <?php if($crowd_login_mode=="mode_create_group"){echo "checked";}?>> <label for="mode_create_group">Create Wordpress accounts for users in the specified group:</label><input name="crowd_group" type="text" value="<?php  echo $crowd_group; ?>" size="12"/>
-      </p>
-      <p style="margin-left:15px; margin-top:0px;"><strong>For latter two options, create account as:</strong><br/>
-        <select name="crowd_account_type">
-          <option value="Administrator" <?php if($crowd_account_type=="Administrator"){echo 'selected="selected"';}?> >Administrator</option>
-          <option value="Editor" <?php if($crowd_account_type=="Editor"){echo 'selected="selected"';}?> >Editor</option>
-          <option value="Author" <?php if($crowd_account_type=="Author"){echo 'selected="selected"';}?> >Author</option>
-          <option value="Contributor" <?php if($crowd_account_type=="Contributor"){echo 'selected="selected"';}?> >Contributor</option>
-          <option value="Subscriber" <?php if($crowd_account_type=="Subscriber"){echo 'selected="selected"';}?> >Subscriber</option>
-        </select>
+      <p style="margin-bottom:0px;"><strong>Login mode:</strong>
+        <div id="cl-login-mode">
+          <div>
+            <input class="cl-mode" id="cl-mode-normal" name="crowd_login_mode" type="radio" value="mode_normal" <?php if($crowd_login_mode=="mode_normal"){echo 'checked="checked"';}?> />
+            <label for="cl-mode-normal">Authenticate Wordpress users against Crowd. I will create the accounts in Wordpress myself. (default)</label>
+          </div>
+          <div>
+            <input class="cl-mode" id="cl-mode-create-all" name="crowd_login_mode" type="radio" value="mode_create_all" <?php if($crowd_login_mode=="mode_create_all"){echo 'checked="checked"';}?> />
+            <label for="cl-mode-create-all">Create Wordpress accounts for anyone who successfully authenticates against Crowd.</label>
+          </div>
+          <div>
+            <input class="cl-mode" id="cl-mode-create-group" name="crowd_login_mode" type="radio" value="mode_create_group" <?php if($crowd_login_mode=="mode_create_group"){echo 'checked="checked"';}?> />
+            <label for="cl-mode-create-group">Create Wordpress accounts for users in the specified group:</label>
+          </div>
+          <div>
+            <input class="cl-mode" id="cl-mode-map-group" name="crowd_login_mode" type="radio" value="mode_map_group" <?php if($rowd_login_mode == "mode_map_group"){ echo 'checked="checked"'; }?> />
+            <label for="cl-mode-map-group">Create Wordpress accounts for user in specified groups, assign them role selected per group</label>
+          </div>
+        </div>
       </p>
       <p>
         <strong>Security mode:</strong><br>

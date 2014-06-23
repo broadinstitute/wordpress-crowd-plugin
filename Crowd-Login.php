@@ -8,6 +8,8 @@ Author: Andrew Teixeira
 Author URI: 
 */
 
+define ("PLUGIN_ROOT", plugin_dir_url(__FILE__));
+
 require_once(__DIR__ . "/Crowd.php");
 require_once(ABSPATH . WPINC . '/registration.php');
 
@@ -15,6 +17,13 @@ require_once(ABSPATH . WPINC . '/registration.php');
 function crowd_menu() {
 	include 'Crowd-Login-Admin.php';
 }
+
+function load_crowd_login_admin_js($hook) {
+  if ("settings_page_crowd-login" === $hook) {
+    wp_enqueue_script("crowd-login-admin-js", PLUGIN_ROOT . "/crowd-login-admin.js", array("jquery", "underscore"));
+  }
+}
+add_action("admin_enqueue_scripts", "load_crowd_login_admin_js");
 
 function crowd_admin_actions() {
 	add_options_page("Crowd Login", "Crowd Login", 10, "crowd-login", "crowd_menu");
