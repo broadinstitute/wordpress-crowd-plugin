@@ -16,9 +16,9 @@ function groupInput(group) {
   return '<div class="additional-input"><label for="cl-crowd-group">Crowd group:</label><input id="cl-crowd-group" name="crowd_group" type="text" value="' + group + '" size="12"/>';
 }
 function mapGroup() {
-  var positions = ["Administrator", "Editor", "Author", "Contributor", "Subscriber"];
+  var positions = _.keys(crowdWordpressRoleMappings);
   function oneLineHtml(position) {
-    var html = '<div><input type="text" name="cl-mapping-crowd-group-' + position + '" />' + position + "</div>";
+    var html = '<div><input type="text" value="' + crowdWordpressRoleMappings[position] + '" name="cl-mapping-crowd-group-' + position + '" />' + position + "</div>";
     return html;
   }
   var html = "<div>" + _.chain(positions).map(oneLineHtml).reduce(function(acc,b) { return acc + b}, "").value() + "</div>";

@@ -72,6 +72,14 @@ $bool_test = 0;
 
 //If admin options updated (uses hidden field)
 if ($_POST['stage'] == 'process') {
+
+  $roles = array("Administrator", "Editor", "Author", "Contributor", "Subscriber");
+  $roles_and_values = array();
+  foreach ($roles as $role) {
+    $roleValue = $_POST["cl-mapping-crowd-group-$role"];
+    $roles_and_values[$role] = $roleValue;
+  }
+  update_option("crowd_wordpress_role_mappings", $roles_and_values);
 	update_option('crowd_url', $_POST['crowd_url']);
 	update_option('crowd_app_name', $_POST['crowd_app_name']);
 	update_option('crowd_app_password', $_POST['crowd_app_password']);
@@ -107,11 +115,28 @@ $crowd_security_mode = get_option('crowd_security_mode');
 $crowd_login_mode = get_option('crowd_login_mode');
 $crowd_group = get_option('crowd_group');
 $crowd_account_type = get_option('crowd_account_type');
+$crowd_wordpress_role_mappings = get_option("crowd_wordpress_role_mappings");
 
 ?>
 <script>
   var crowdAccountType = "<?php echo $crowd_account_type; ?>";
   var crowdGroup = "<?php echo $crowd_group; ?>";
+  var crowdWordpressRoleMappings =
+<?php
+  $mappings = array();
+  foreach ($crowd_wordpress_role_mappings as $role => $group) {
+    array_push($mappings, '"' . $role . '":"' . $group . '"');
+  }
+  $result = '{';
+  for ($i = 0; $i < count($crowd_wordpress_role_mappings); $i++) {
+    if ($i != 0) {
+      $result .= ",";
+    }
+    $result .= $mappings[$i];
+  }
+  $result .= '};';
+  echo $result;
+?>
 </script>
 <div class="container">
   <div class="banner"><h1>Crowd Login 0.1</h1></div>
@@ -159,7 +184,7 @@ $crowd_account_type = get_option('crowd_account_type');
             <label for="cl-mode-create-group">Create Wordpress accounts for users in the specified group:</label>
           </div>
           <div>
-            <input class="cl-mode" id="cl-mode-map-group" name="crowd_login_mode" type="radio" value="mode_map_group" <?php if($rowd_login_mode == "mode_map_group"){ echo 'checked="checked"'; }?> />
+            <input class="cl-mode" id="cl-mode-map-group" name="crowd_login_mode" type="radio" value="mode_map_group" <?php if($crowd_login_mode == "mode_map_group"){ echo 'checked="checked"'; }?> />
             <label for="cl-mode-map-group">Create Wordpress accounts for user in specified groups, assign them role selected per group</label>
           </div>
         </div>
