@@ -19,6 +19,7 @@ Having a single login for every service is a must in large organizations. This p
 * * Normal Mode: Authenticates existing Wordpress usernames against Crowd. This requires you to create all Wordpress accounts manually using the same user names as those in your Crowd directory.
 * * Account Creation Mode 1: Creates Wordpress accounts automatically for any Crowd user.
 * * Account Creation Mode 2: Creates Wordpress accounts automatically for Crowd users in a specific Group you specify.
+* * Account Creation Mode 3: Creates Wordpress accounts automatically for Crowd users in groups you specify, you have to map these groups onto Wordpress roles. If user is in Crowd group A, B and mapping from B Crowd group is to role which has more capabilities like **Administrator**, than role which is mapped from Crowd group A, like **Editor**, then the user will have the role with more capabilities (**Administrator**).
 * Intuitive control panel.
 
 = Architecture =
