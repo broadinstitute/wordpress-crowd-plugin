@@ -7,7 +7,7 @@
     background: #EBEBEB;
     margin: 10px;
     width:450px;
-    height:375px;
+    height:575px;
     font-family: Calibri,Helvetica,Arial,sans-serif;
     float: left; 
   }
@@ -34,7 +34,7 @@
     background: #EBEBEB;
     margin: 10px 10px 10px 0px;
     width:450px;
-    height:375px;
+    height:575px;
     font-family: Calibri,Helvetica,Arial,sans-serif;
     float: left; 
   }
