@@ -208,23 +208,15 @@ function get_crowd_groups($username) {
 }
 
 function crowd_is_in_group($username) {
-	global $crowd;
 	$result = false;
+	$crowd_group = get_option('crowd_group');
 
-	// If we can't get a Crowd instance, fail
-	if ($crowd == NULL) {
-		return $result;
-	}
-
-	$crowd_group = $get_option('crowd_group');
-
-	$groups = $crowd->findGroupMemberships($username);
+	$groups = get_crowd_groups($username);
 	if ($groups == NULL) {
 		return $result;
 	}
 
-	$result = in_array($crowd_group, $groups);	
-
+	$result = $crowd_group === $groups->string;
 	return $result;
 }
 
