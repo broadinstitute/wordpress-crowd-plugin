@@ -1,6 +1,6 @@
 function selectRole(checkedRole, selectName) {
   function checked(role) {
-    return (role === checkedRole) ? 'checked="checked"' : "" ;
+    return (role === checkedRole) ? 'selected="selected"' : "" ;
   }
   var selectNameHtml = (null == selectName) ? "crowd_account_type" : selectName;
   var html = ' <select class="additional-input" name="' + selectNameHtml + '"> ' +
