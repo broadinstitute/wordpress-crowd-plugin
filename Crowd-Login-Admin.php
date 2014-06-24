@@ -79,14 +79,21 @@ if ($_POST['stage'] == 'process') {
     $roleValue = $_POST["cl-mapping-crowd-group-$role"];
     $roles_and_values[$role] = $roleValue;
   }
-  update_option("crowd_wordpress_role_mappings", $roles_and_values);
+  $crowd_login_mode = $_POST['crowd_login_mode'];
+  if ("mode_map_group" === $crowd_login_mode) {
+    update_option("crowd_wordpress_role_mappings", $roles_and_values);
+  }
+  if ("mode_create_group" === $crowd_login_mode) {
+    update_option('crowd_group', $_POST['crowd_group']);
+  }
+  if (in_array($crowd_login_mode, array("mode_create_group", "mode_create_all"))) {
+    update_option('crowd_account_type', $_POST['crowd_account_type']);
+  }
 	update_option('crowd_url', $_POST['crowd_url']);
 	update_option('crowd_app_name', $_POST['crowd_app_name']);
 	update_option('crowd_app_password', $_POST['crowd_app_password']);
 	update_option('crowd_security_mode', $_POST['crowd_security_mode']);
-	update_option('crowd_login_mode', $_POST['crowd_login_mode']);
-	update_option('crowd_group', $_POST['crowd_group']);
-	update_option('crowd_account_type', $_POST['crowd_account_type']);
+	update_option('crowd_login_mode', $crowd_login_mode);
 } elseif ($_POST['stage'] == 'test') {
 	//Test credentials
 	global $bool_test;
