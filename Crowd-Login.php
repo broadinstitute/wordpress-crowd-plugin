@@ -8,13 +8,22 @@ Author: Andrew Teixeira
 Author URI: 
 */
 
-require_once( WP_PLUGIN_DIR."/crowd-login/Crowd.php");
-require_once( ABSPATH . WPINC . '/registration.php');
+define ("PLUGIN_ROOT", plugin_dir_url(__FILE__));
+
+require_once(__DIR__ . "/Crowd.php");
+require_once(ABSPATH . WPINC . '/registration.php');
 
 //Admin
 function crowd_menu() {
 	include 'Crowd-Login-Admin.php';
 }
+
+function load_crowd_login_admin_js($hook) {
+  if ("settings_page_crowd-login" === $hook) {
+    wp_enqueue_script("crowd-login-admin-js", PLUGIN_ROOT . "/crowd-login-admin.js", array("jquery", "underscore"));
+  }
+}
+add_action("admin_enqueue_scripts", "load_crowd_login_admin_js");
 
 function crowd_admin_actions() {
 	add_options_page("Crowd Login", "Crowd Login", 10, "crowd-login", "crowd_menu");
@@ -29,6 +38,7 @@ function crowd_activation_hook() {
 	add_option('crowd_security_mode', 'security_low');
 	add_option('crowd_login_mode', 'mode_normal');
 	add_option('crowd_account_type', 'Contributor');
+	add_option("crowd_wordpress_role_mappings", array());
 }
 
 // Reset Crowd instance and principal token
@@ -91,14 +101,36 @@ function crowd_authenticate($user, $username, $password) {
 	}
 
 	$auth_result = crowd_can_authenticate($username, $password);
+
 	if($auth_result == true && !is_a($auth_result, 'WP_Error')) {
 		$user = get_userdatabylogin($username);
 
 		if ( !$user || (strtolower($user->user_login) != strtolower($username)) ) {
 			//No user, can we create?
 			switch(get_option('crowd_login_mode')) {
+
+        case "mode_map_group":
+          $mappings = get_option("crowd_wordpress_role_mappings");
+          $crowd_groups = get_crowd_groups($username)->string;
+          $crowd_groups = is_array($crowd_groups) ? $crowd_groups : array($crowd_groups);
+          $role = NULL;
+          foreach ($mappings as $mapping_key => $mapping_value) {
+            if (in_array($mapping_value, $crowd_groups)) {
+              $role = $mapping_key;
+              break;
+            }
+          }
+          if ($role != NULL) {
+            $new_user_id = crowd_create_wp_user($username, $role);
+            return new WP_User($new_user_id);
+          } else {
+            do_action("wp_login_failed", $username);
+            return new WP_Error('group not mapped', __("<strong>Crowd Login Error</strong>: Crowd group is not mapped."));
+          }
+          break;
+
 				case 'mode_create_all':
-					$new_user_id = crowd_create_wp_user($username);
+					$new_user_id = crowd_create_wp_user($username, get_option('crowd_account_type'));
 					if(!is_a($new_user_id, 'WP_Error')) {
 						//It worked
 						return new WP_User($new_user_id);
@@ -110,7 +142,7 @@ function crowd_authenticate($user, $username, $password) {
 					
 				case 'mode_create_group':
 					if(crowd_is_in_group($username)) {
-						$new_user_id = crowd_create_wp_user($username);
+						$new_user_id = crowd_create_wp_user($username, get_option('crowd_account_type'));
 						if(!is_a($new_user_id, 'WP_Error')) {
 							//It worked
 							return new WP_User($new_user_id);
@@ -168,28 +200,29 @@ function crowd_can_authenticate($username, $password) {
 	return $princ_token;
 }
 
-function crowd_is_in_group($username) {
-	global $crowd;
-	$result = false;
-
-	// If we can't get a Crowd instance, fail
+function get_crowd_groups($username) {
+  global $crowd;
 	if ($crowd == NULL) {
-		return $result;
+		return NULL;
 	}
-
-	$crowd_group = $get_option('crowd_group');
-
 	$groups = $crowd->findGroupMemberships($username);
+  return $groups;
+}
+
+function crowd_is_in_group($username) {
+	$result = false;
+	$crowd_group = get_option('crowd_group');
+
+	$groups = get_crowd_groups($username);
 	if ($groups == NULL) {
 		return $result;
 	}
 
-	$result = in_array($crowd_group, $groups);	
-
+	$result = $crowd_group === $groups->string;
 	return $result;
 }
 
-function crowd_create_wp_user($username) {
+function crowd_create_wp_user($username, $role) {
 	global $crowd, $princ_token;
 	$result = 0;
 
@@ -213,7 +246,7 @@ function crowd_create_wp_user($username) {
 		'display_name'  => $person['givenName'] .' '. $person['sn'],
 		'first_name'    => $person['givenName'],
 		'last_name'     => $person['sn'],
-		'role'		=> strtolower(get_option('crowd_account_type'))
+		'role'		=> strtolower($role) // get_option('crowd_account_type'))
 	);
 			
 	$result = wp_insert_user($userData); 
