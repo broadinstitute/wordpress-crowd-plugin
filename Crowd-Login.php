@@ -112,10 +112,12 @@ function crowd_authenticate($user, $username, $password) {
         case "mode_map_group":
           $mappings = get_option("crowd_wordpress_role_mappings");
           $crowd_groups = get_crowd_groups($username)->string;
+          $crowd_groups = is_array($crowd_groups) ? $crowd_groups : array($crowd_groups);
           $role = NULL;
           foreach ($mappings as $mapping_key => $mapping_value) {
-            if ($mapping_value === $crowd_groups) {
+            if (in_array($mapping_value, $crowd_groups)) {
               $role = $mapping_key;
+              break;
             }
           }
           if ($role != NULL) {
