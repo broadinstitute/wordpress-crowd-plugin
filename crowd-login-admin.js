@@ -21,7 +21,7 @@ function mapGroup() {
     var html = '<div><input type="text" value="' + crowdWordpressRoleMappings[position] + '" name="cl-mapping-crowd-group-' + position + '" />' + position + "</div>";
     return html;
   }
-  var html = "<div>" + _.chain(positions).map(oneLineHtml).reduce(function(acc,b) { return acc + b}, "").value() + "</div>";
+  var html = '<div class="additional-input">' + _.chain(positions).map(oneLineHtml).reduce(function(acc,b) { return acc + b}, "").value() + "</div>";
   return html;
 }
 
