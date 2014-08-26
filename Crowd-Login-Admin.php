@@ -142,12 +142,14 @@ $crowd_account_type = get_option('crowd_account_type');
 <input name="crowd_login_mode" type="radio" value="mode_create_all" <?php if($crowd_login_mode=="mode_create_all"){echo "checked";}?> > <label for="mode_create_all">Create Wordpress accounts for anyone who successfully authenticates against Crowd.</label><br/>
 <input name="crowd_login_mode" type="radio" value="mode_create_group" <?php if($crowd_login_mode=="mode_create_group"){echo "checked";}?>> <label for="mode_create_group">Create Wordpress accounts for users in the specified group:</label><input name="crowd_group" type="text" value="<?php  echo $crowd_group; ?>" size="12"/></p>
 <p style="margin-left:15px; margin-top:0px;"><strong>For latter two options, create account as:</strong><br/>
+
+<?php global $wp_roles; ?>
 <select name="crowd_account_type">
-<option value="Administrator" <?php if($crowd_account_type=="Administrator"){echo 'selected="selected"';}?> >Administrator</option>
-<option value="Editor" <?php if($crowd_account_type=="Editor"){echo 'selected="selected"';}?> >Editor</option>
-<option value="Author" <?php if($crowd_account_type=="Author"){echo 'selected="selected"';}?> >Author</option>
-<option value="Contributor" <?php if($crowd_account_type=="Contributor"){echo 'selected="selected"';}?> >Contributor</option>
-<option value="Subscriber" <?php if($crowd_account_type=="Subscriber"){echo 'selected="selected"';}?> >Subscriber</option>
+
+<?php foreach ($wp_roles->roles as $role => $value): ?>
+		<option value="<?php echo $role; ?>" <?php if($crowd_account_type==$role){echo 'selected="selected"';}?> ><?php echo $value['name']; ?></option>
+<?php endforeach; ?>
+
 </select>
 </p>
 <p>
