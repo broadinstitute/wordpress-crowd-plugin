@@ -1,15 +1,14 @@
 <?php
 /*
 Plugin Name: Crowd Login
-Plugin URI: 
+Plugin URI:
 Description:  Authenticates Wordpress usernames against Atlassian Crowd.
 Version: 0.1
 Author: Andrew Teixeira
-Author URI: 
+Author URI:
 */
 
 require_once( WP_PLUGIN_DIR."/crowd-login/Crowd.php");
-require_once( ABSPATH . WPINC . '/registration.php');
 
 //Admin
 function crowd_menu() {
@@ -17,7 +16,7 @@ function crowd_menu() {
 }
 
 function crowd_admin_actions() {
-	add_options_page("Crowd Login", "Crowd Login", 10, "crowd-login", "crowd_menu");
+	add_options_page("Crowd Login", "Crowd Login", "administrator", "crowd-login", "crowd_menu");
 }
 
 function crowd_activation_hook() {
@@ -92,7 +91,7 @@ function crowd_authenticate($user, $username, $password) {
 
 	$auth_result = crowd_can_authenticate($username, $password);
 	if($auth_result == true && !is_a($auth_result, 'WP_Error')) {
-		$user = get_userdatabylogin($username);
+		$user = get_user_by('login', $username);
 
 		if ( !$user || (strtolower($user->user_login) != strtolower($username)) ) {
 			//No user, can we create?
@@ -103,11 +102,11 @@ function crowd_authenticate($user, $username, $password) {
 						//It worked
 						return new WP_User($new_user_id);
 					} else {
-						do_action( 'wp_login_failed', $username );				
+						do_action( 'wp_login_failed', $username );
 						return new WP_Error('invalid_username', __('<strong>Crowd Login Error</strong>: Crowd credentials are correct and user creation is allowed but an error occurred creating the user in Wordpress. Actual WordPress error: '.$new_user_id->get_error_message()));
 					}
 					break;
-					
+
 				case 'mode_create_group':
 					if(crowd_is_in_group($username)) {
 						$new_user_id = crowd_create_wp_user($username);
@@ -115,17 +114,17 @@ function crowd_authenticate($user, $username, $password) {
 							//It worked
 							return new WP_User($new_user_id);
 						} else {
-							do_action( 'wp_login_failed', $username );				
+							do_action( 'wp_login_failed', $username );
 							return new WP_Error('invalid_username', __('<strong>Crowd Login Error</strong>: Crowd credentials are correct and user creation is allowed and you are in the correct group but an error occurred creating the user in Wordpress. Actual WordPress error: '.$new_user_id->get_error_message()));
 						}
 					} else {
-						do_action( 'wp_login_failed', $username );				
+						do_action( 'wp_login_failed', $username );
 						return new WP_Error('invalid_username', __('<strong>Crowd Login Error</strong>: Crowd Login credentials are correct and user creation is allowed but Crowd user was not in the correct group.'));
 					}
 					break;
-					
+
 				default:
-					do_action( 'wp_login_failed', $username );				
+					do_action( 'wp_login_failed', $username );
 					return new WP_Error('invalid_username', __('<strong>Crowd Login Error</strong>: Crowd Login mode does not permit account creation.'));
 			}
 		} else {
@@ -134,7 +133,7 @@ function crowd_authenticate($user, $username, $password) {
 				if(crowd_is_in_group($username)) {
 					return new WP_User($user->ID);
 				} else {
-					do_action( 'wp_login_failed', $username );				
+					do_action( 'wp_login_failed', $username );
 					return new WP_Error('invalid_username', __('<strong>Crowd Login Error</strong>: Crowd credentials were correct but user is not in the correct group.'));
 				}
 			} else {
@@ -184,7 +183,7 @@ function crowd_is_in_group($username) {
 		return $result;
 	}
 
-	$result = in_array($crowd_group, $groups);	
+	$result = in_array($crowd_group, $groups);
 
 	return $result;
 }
@@ -215,8 +214,8 @@ function crowd_create_wp_user($username) {
 		'last_name'     => $person['sn'],
 		'role'		=> strtolower(get_option('crowd_account_type'))
 	);
-			
-	$result = wp_insert_user($userData); 
+
+	$result = wp_insert_user($userData);
 
 	return $result;
 }

@@ -11,7 +11,7 @@ div.crowd_style{
 	width:450px;
 	height:375px;
 	font-family: Calibri,Helvetica,Arial,sans-serif;
-	float: left; 
+	float: left;
 }
 div.crowd_style_test{
 	padding: 5px;
@@ -38,7 +38,7 @@ div.advanced{
 	width:450px;
 	height:375px;
 	font-family: Calibri,Helvetica,Arial,sans-serif;
-	float: left; 
+	float: left;
 }
 div.banner{
 	padding 5px;
@@ -63,7 +63,7 @@ p{
 }
 </style>
 </head>
-<?php 
+<?php
 //Debug
 $debug = "false";
 
@@ -74,7 +74,7 @@ $this_page = $_SERVER['PHP_SELF'].'?page='.$_GET['page'];
 $bool_test = 0;
 
 //If admin options updated (uses hidden field)
-if ($_POST['stage'] == 'process') {
+if (isset($_POST['stage']) && $_POST['stage'] == 'process') {
 	update_option('crowd_url', $_POST['crowd_url']);
 	update_option('crowd_app_name', $_POST['crowd_app_name']);
 	update_option('crowd_app_password', $_POST['crowd_app_password']);
@@ -82,19 +82,19 @@ if ($_POST['stage'] == 'process') {
 	update_option('crowd_login_mode', $_POST['crowd_login_mode']);
 	update_option('crowd_group', $_POST['crowd_group']);
 	update_option('crowd_account_type', $_POST['crowd_account_type']);
-} elseif ($_POST['stage'] == 'test') {
+} elseif (isset($_POST['stage']) && $_POST['stage'] == 'test') {
 	//Test credentials
 	global $bool_test;
-	
+
 	//Temporarily change security mode for test. Store old setting.
 	$temp_holder = get_option("crowd_security_mode");
 	update_option("crowd_security_mode", "security_high");
-	
+
 	$test_user = wp_authenticate($_POST['test_username'],$_POST['test_password']);
-	
+
 	//Restore security mode setting.
 	update_option("crowd_security_mode", $temp_holder);
-	
+
 	if ($test_user->ID > 0) {
 		$bool_test = 1;
 	} else {
@@ -142,12 +142,14 @@ $crowd_account_type = get_option('crowd_account_type');
 <input name="crowd_login_mode" type="radio" value="mode_create_all" <?php if($crowd_login_mode=="mode_create_all"){echo "checked";}?> > <label for="mode_create_all">Create Wordpress accounts for anyone who successfully authenticates against Crowd.</label><br/>
 <input name="crowd_login_mode" type="radio" value="mode_create_group" <?php if($crowd_login_mode=="mode_create_group"){echo "checked";}?>> <label for="mode_create_group">Create Wordpress accounts for users in the specified group:</label><input name="crowd_group" type="text" value="<?php  echo $crowd_group; ?>" size="12"/></p>
 <p style="margin-left:15px; margin-top:0px;"><strong>For latter two options, create account as:</strong><br/>
+
+<?php global $wp_roles; ?>
 <select name="crowd_account_type">
-<option value="Administrator" <?php if($crowd_account_type=="Administrator"){echo 'selected="selected"';}?> >Administrator</option>
-<option value="Editor" <?php if($crowd_account_type=="Editor"){echo 'selected="selected"';}?> >Editor</option>
-<option value="Author" <?php if($crowd_account_type=="Author"){echo 'selected="selected"';}?> >Author</option>
-<option value="Contributor" <?php if($crowd_account_type=="Contributor"){echo 'selected="selected"';}?> >Contributor</option>
-<option value="Subscriber" <?php if($crowd_account_type=="Subscriber"){echo 'selected="selected"';}?> >Subscriber</option>
+
+<?php foreach ($wp_roles->roles as $role => $value): ?>
+		<option value="<?php echo $role; ?>" <?php if($crowd_account_type==$role){echo 'selected="selected"';}?> ><?php echo $value['name']; ?></option>
+<?php endforeach; ?>
+
 </select>
 </p>
 <p>
